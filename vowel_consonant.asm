@@ -1,112 +1,199 @@
+INCLUDE 'EMU8086.INC'
 .MODEL SMALL
-.STACK 100H    
-
+.STACK 100H
 .DATA
-str DB 80 DUP
 
-.CODE   
-MOV AX, @DATA
-MOV DS, AX
+VL DB 0 
+CNS DB 0
+NUMBER DB 0
+SPACE DB 0
+OTHER DB 0
 
-MAIN PROC    
-           
-           
-MOV BL,48           
-MOV CL, 48
-MOV AH, 1 
+.CODE
 
-NEXT:
-INT 21H                   
-CMP AL, 0DH
-JZ EXIT
+MOV AX,@DATA
+MOV DS,AX
 
-CMP AL,'z'
-JG ignore  
-CMP AL,'A'
-JL ignore
-
-CMP AL,96
-JG  OK
-
-CMP AL,90
-JG  ignore
-
-OK:
-
-MOV str[SI], AL
-
-
-CMP str[SI],'A'  
-JZ vowel
-CMP str[SI],'a'
-JZ vowel
-CMP str[SI],'E'
-JZ vowel
-CMP str[SI],'e'
-JZ vowel
-CMP str[SI],'I'
-JZ vowel
-CMP str[SI],'i'
-JZ vowel
-CMP str[SI],'O'
-JZ vowel       
-CMP str[SI],'o'
-JZ vowel
-CMP str[SI],'U'
-JZ vowel
-CMP str[SI],'u'
-JZ vowel       
-       
-       
-ADD CL,1
-SUB BL,1
-vowel:
-ADD BL,1
-
-ignore:
-
-INC SI
-JMP NEXT            
-EXIT:                 
-
-DEC SI
-            
-MOV AH,2 
-MOV DL,0AH
-INT 21H
-MOV DL,0DH
-INT 21H
-            
-
-;OUTPUT:
-;MOV DL, str[SI]
-;INT 21H       
-;DEC SI
-;CMP SI, -1
-;JZ SESH 
-;JMP OUTPUT
-
-;SESH:
- 
- 
-MOV AH,2
-MOV DL,BL
-INT 21H   
-
-MOV AH,2 
-MOV DL,0AH
-INT 21H
-MOV DL,0DH
-INT 21H
-
-MOV AH,2
-MOV DL,CL
-INT 21H  
-           
-              
-MOV AH, 4CH
-INT 21H     
-
-MAIN ENDP     
-
-END MAIN
+MAIN PROC 
+    PRINTN
+    PRINT 'ENTER THE STRING :'
+    
+    MOV VL,0
+    MOV CNS,0
+    MOV NUMBER,0
+    MOV SPACE,0
+    MOV OTHER,0
+    
+    MOV AH,1
+    
+    NEXT:
+        INT 21H
+        CMP AL,0DH
+        JZ OUTPUT
+        
+        CMP AL,'z'
+        JG OTHERS
+        
+        CMP AL,'A'
+        JL OTHERS
+        
+        JMP CHAR
+        
+    CHAR:
+        CMP AL,'A'
+        JZ VOWEL
+        
+        CMP AL,'E'
+        JZ VOWEL
+        
+        CMP AL,'I'
+        JZ VOWEL
+        
+        CMP AL,'O'
+        JZ VOWEL
+        
+        CMP AL,'U'
+        JZ VOWEL 
+        
+        
+        CMP AL,'a'
+        JZ VOWEL
+        
+        CMP AL,'e'
+        JZ VOWEL
+        
+        CMP AL,'i'
+        JZ VOWEL
+        
+        CMP AL,'o'
+        JZ VOWEL
+        
+        CMP AL,'u'
+        JZ VOWEL 
+        
+        
+        JMP CONST
+        
+        
+        
+     CONST:
+        INC CNS
+        JMP NEXT
+        
+     VOWEL:
+        INC VL
+        
+        JMP NEXT
+        
+     OTHERS:
+     
+        CMP AL,' '
+        JNE SPECIAL
+        
+        INC SPACE
+        JMP NEXT
+        
+        
+     SPECIAL:
+     
+        CMP AL,'0'
+        JL ALL
+        
+        CMP AL,'9'
+        
+        JG ALL
+        
+        INC NUMBER
+        JMP NEXT
+        
+        
+     ALL:
+        INC OTHER
+        JMP NEXT
+        
+        
+     OUTPUT:
+     
+        MOV AH,2
+        
+        MOV DL,0AH
+        INT 21H
+        MOV DL,0DH
+        INT 21H
+        
+        ADD VL,48
+        PRINTN
+        PRINT 'VOWEL: ' 
+        MOV DL,VL
+        INT 21H
+        
+        MOV DL,0AH
+        INT 21H
+        MOV DL,0DH
+        INT 21H
+        
+        
+        ADD CNS,48
+        PRINTN
+        PRINT 'CONSTANT: ' 
+        MOV DL,CNS
+        INT 21H
+        
+         
+        MOV DL,0AH
+        INT 21H
+        MOV DL,0DH
+        INT 21H
+        
+        
+        ADD NUMBER,48
+        PRINTN
+        PRINT 'NUMBER: ' 
+        MOV DL,NUMBER
+        INT 21H 
+        
+         
+        MOV DL,0AH
+        INT 21H
+        MOV DL,0DH
+        INT 21H
+        
+        
+        ADD SPACE,48
+        PRINTN
+        PRINT 'SPACE: ' 
+        MOV DL,SPACE
+        INT 21H
+        
+         
+        MOV DL,0AH
+        INT 21H
+        MOV DL,0DH
+        INT 21H
+        
+        
+        ADD OTHER,48
+        PRINTN
+        PRINT 'OTHER: ' 
+        MOV DL,OTHER
+        INT 21H 
+        
+         
+        MOV DL,0AH
+        INT 21H
+        MOV DL,0DH
+        INT 21H 
+        
+        
+        MOV AH,4CH
+        INT 21H
+        
+        
+        MAIN ENDP
+        END MAIN
+        
+      
+        
+        
+        
+        
